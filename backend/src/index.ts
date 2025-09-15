@@ -21,6 +21,11 @@ import analyticsRoutes from "./routes/analytics.route";
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ai-finance-1.onrender.com",
+];
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,7 +33,13 @@ app.use(passport.initialize());
 
 app.use(
   cors({
-    origin: Env.FRONTEND_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
